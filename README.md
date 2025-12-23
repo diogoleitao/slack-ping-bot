@@ -25,6 +25,8 @@ A high-performance Slack bot that sends notification pings without persistent me
 ## Requirements
 
 - **Ruby 3.4.x** (latest stable: 3.4.8)
+  - Minimum: Ruby 3.0
+  - Recommended: Ruby 3.4.8 with YJIT
 - **Redis** (optional, for distributed rate limiting)
 - **Slack workspace** with permissions to install apps
 
@@ -266,73 +268,20 @@ All error messages are ephemeral (only visible to command sender):
 
 ## Logging
 
-### Structured JSON Logging
+Structured JSON logging via [Ougai](https://github.com/tilfin/ougai). Compatible with Datadog, CloudWatch, Splunk, ELK Stack.
 
-The bot uses [Ougai](https://github.com/tilfin/ougai) for structured JSON logging compatible with Bunyan/Pino format.
-
-**Log Format:**
-```json
-{"name":"main","hostname":"localhost","pid":12345,"level":30,"time":"2025-12-23T13:30:15.123Z","v":0,"msg":"Received /ping command","user_id":"U123","channel_id":"C456"}
-```
-
-**Log Levels:**
-- `trace` (10) - Very detailed debugging
-- `debug` (20) - Debugging information
-- `info` (30) - Informational messages (default)
-- `warn` (40) - Warning messages
-- `error` (50) - Error messages
-- `fatal` (60) - Fatal errors
-
-**Configuration:**
-
-Set log level via environment variable:
+Configure log level:
 ```bash
-LOG_LEVEL=debug  # Options: trace, debug, info, warn, error, fatal
+LOG_LEVEL=info  # Options: trace, debug, info, warn, error, fatal
 ```
 
-**View Pretty Logs:**
-
-Install Bunyan CLI to view formatted logs:
-```bash
-npm install -g bunyan
-cat logs/production.log | bunyan
-```
-
-Output:
-```
-[2025-12-23T13:30:15.123Z]  INFO: main/12345: Received /ping command (user_id=U123, channel_id=C456)
-[2025-12-23T13:30:15.456Z]  INFO: main/12345: Sent ping (channel=D789, timestamp=1234567890.123)
-[2025-12-23T13:30:15.612Z]  INFO: main/12345: Deleted ping message (channel=D789, delay_ms=150)
-```
-
-**Log Integration:**
-
-JSON format works seamlessly with:
-- **Datadog**: `level:error service:slack-ping-bot`
-- **CloudWatch Logs Insights**: `fields @timestamp, level, message | filter level = "error"`
-- **Splunk**: Parse JSON automatically
-- **ELK Stack**: Direct JSON ingestion
-- **jq** (command-line): `cat app.log | jq 'select(.level == "error")'`
+See [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md#6-logging-implementation) for advanced configuration and integration examples.
 
 ## Performance
 
-### Ruby 3.4 with YJIT
+Uses Ruby 3.4's **YJIT** (Just-In-Time compiler) for 15-25% faster request processing.
 
-This bot uses Ruby 3.4's YJIT (Yet Another Ruby JIT) compiler:
-
-- **Speed**: 15-25% faster request processing
-- **Memory**: ~40MB additional overhead
-- **Production-ready**: Stable since Ruby 3.1, optimized in 3.3+
-- **Enable**: Set `RUBY_YJIT_ENABLE=1` environment variable
-
-### Benchmarks
-
-Without YJIT (Ruby 3.4):
-- Avg response time: ~200-300ms
-
-With YJIT enabled:
-- Avg response time: ~150-250ms
-- 15-20% reduction in latency
+Enable YJIT by setting `RUBY_YJIT_ENABLE=1` in your environment (included in `.env.example`).
 
 ## Troubleshooting
 
@@ -372,65 +321,13 @@ echo $RUBY_YJIT_ENABLE
 # Should output: 1
 ```
 
-## Development
+## Contributing
 
-### Project Structure
-
-```
-slack-ping-bot/
-├── app.rb                  # Main Sinatra application
-├── config.ru               # Rack configuration
-├── Dockerfile              # Docker container with YJIT
-├── Gemfile                 # Ruby 3.4 dependencies
-├── lib/
-│   ├── ping_handler.rb    # Core ping logic
-│   ├── rate_limiter.rb    # Rate limiting (Redis + fallback)
-│   ├── slack_client.rb    # Slack API wrapper
-│   ├── slack_verifier.rb  # Security verification
-│   └── user_resolver.rb   # User mention parsing
-└── config/
-    └── puma.rb            # Puma server with YJIT notes
-```
-
-### Testing
-
-See [`docs/TODO.md`](docs/TODO.md) for the complete manual testing checklist and implementation roadmap.
-
-### Contributing
-
-This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for all commit messages.
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for complete contribution guidelines.
-
-**Quick start:**
-
-```bash
-# Clone repository
-git clone <repo-url>
-cd slack-ping-bot
-
-# Install dependencies
-bundle install
-
-# Install commit message validation hook
-./git-hooks/install.sh
-
-# Make commits following conventional format
-git commit -m "feat(ping): add new feature"
-```
-
-**Commit format:**
-```
-type(scope): subject
-```
-
-Valid types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
-
-## Ruby Version Compatibility
-
-- **Minimum**: Ruby 3.0 (for Puma 7.x and Dotenv 3.x)
-- **Recommended**: Ruby 3.4.8 (latest stable with optimized YJIT)
-- **Tested on**: Ruby 3.4.8
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines including:
+- Conventional Commits format
+- Git hooks setup
+- Code style guidelines
+- Pull request process
 
 ## License
 
