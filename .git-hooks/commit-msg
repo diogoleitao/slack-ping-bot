@@ -1,0 +1,49 @@
+#!/bin/sh
+# Conventional Commits validation hook
+# See: https://www.conventionalcommits.org/en/v1.0.0/
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Pattern: type(scope): subject OR type!(scope): subject
+# - type: required (feat|fix|docs|style|refactor|perf|test|chore)
+# - !: optional (breaking change indicator)
+# - scope: optional (any text in parentheses)
+# - subject: required (1-72 characters)
+pattern="^(feat|fix|docs|style|refactor|perf|test|chore)!?(\(.+\))?: .{1,72}$"
+
+if ! echo "$commit_msg" | head -n1 | grep -Eq "$pattern"; then
+    echo "❌ Invalid commit message format"
+    echo ""
+    echo "Commit message must follow Conventional Commits:"
+    echo "  https://www.conventionalcommits.org/en/v1.0.0/"
+    echo ""
+    echo "Format:"
+    echo "  type(scope): subject"
+    echo "  type!(scope): subject  (breaking change)"
+    echo ""
+    echo "Types:"
+    echo "  feat, fix, docs, style, refactor, perf, test, chore"
+    echo ""
+    echo "Scope:"
+    echo "  Optional. Examples: ping, rate-limiter, logging, docs"
+    echo ""
+    echo "Subject:"
+    echo "  1-72 characters, imperative mood, no period at end"
+    echo ""
+    echo "Examples:"
+    echo "  feat(ping): add scheduled ping support"
+    echo "  fix(rate-limiter): resolve Redis fallback"
+    echo "  feat!(api): change rate limit to 5 per minute"
+    echo "  docs: update installation instructions"
+    echo ""
+    echo "Your message:"
+    echo "  $(echo "$commit_msg" | head -n1)"
+    echo ""
+    echo "See CONTRIBUTING.md for complete guidelines"
+    echo ""
+    exit 1
+fi
+
+echo "✅ Commit message format valid"
+exit 0

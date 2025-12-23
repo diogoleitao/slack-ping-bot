@@ -1,0 +1,29 @@
+# Environment variables
+.env
+
+# Ruby/Bundler
+vendor/bundle/
+.bundle/
+*.gem
+*.rbc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+log/
+
+# Temporary files
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock files (keep Gemfile.lock for deployment consistency)
+# Gemfile.lock is intentionally NOT ignored

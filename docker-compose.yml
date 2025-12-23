@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --save ""  # Pure in-memory, no persistence
+
+  app:
+    build: .
+    ports:
+      - "4567:4567"
+    environment:
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_SIGNING_SECRET: ${SLACK_SIGNING_SECRET}
+      REDIS_URL: redis://redis:6379/0
+      RACK_ENV: production
+      RUBY_YJIT_ENABLE: 1  # Enable YJIT in production
+    depends_on:
+      - redis
