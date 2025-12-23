@@ -11,6 +11,7 @@ VCR.configure do |config|
   config.filter_sensitive_data('<SLACK_SIGNING_SECRET>') { ENV.fetch('SLACK_SIGNING_SECRET', nil) }
 
   config.ignore_localhost = true
+  config.allow_http_connections_when_no_cassette = true
 
   config.default_cassette_options = {
     record: :once,
