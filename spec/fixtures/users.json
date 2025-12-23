@@ -1,0 +1,48 @@
+{
+  "active_user": {
+    "id": "U123456",
+    "name": "johndoe",
+    "real_name": "John Doe",
+    "is_bot": false,
+    "deleted": false,
+    "profile": {
+      "display_name": "john",
+      "real_name": "John Doe",
+      "email": "john@example.com"
+    }
+  },
+  "another_user": {
+    "id": "U789ABC",
+    "name": "janedoe",
+    "real_name": "Jane Doe",
+    "is_bot": false,
+    "deleted": false,
+    "profile": {
+      "display_name": "jane",
+      "real_name": "Jane Doe",
+      "email": "jane@example.com"
+    }
+  },
+  "bot_user": {
+    "id": "UBOT123",
+    "name": "slackbot",
+    "real_name": "Slackbot",
+    "is_bot": true,
+    "deleted": false,
+    "profile": {
+      "display_name": "slackbot",
+      "real_name": "Slackbot"
+    }
+  },
+  "deactivated_user": {
+    "id": "U789DEL",
+    "name": "olduser",
+    "real_name": "Old User",
+    "is_bot": false,
+    "deleted": true,
+    "profile": {
+      "display_name": "olduser",
+      "real_name": "Old User"
+    }
+  }
+}

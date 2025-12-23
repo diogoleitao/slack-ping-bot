@@ -27,3 +27,13 @@ Thumbs.db
 
 # Lock files (keep Gemfile.lock for deployment consistency)
 # Gemfile.lock is intentionally NOT ignored
+
+# RSpec
+spec/examples.txt
+
+# SimpleCov
+coverage/
+.coverage/
+
+# Test artifacts
+tmp/

@@ -1,0 +1,42 @@
+{
+  "valid_ping_command": {
+    "team_id": "T12345",
+    "channel_id": "C123456",
+    "user_id": "U123456",
+    "command": "/ping",
+    "text": "@janedoe",
+    "response_url": "https://hooks.slack.com/commands/xxx"
+  },
+  "dm_ping_command": {
+    "team_id": "T12345",
+    "channel_id": "D123456",
+    "user_id": "U123456",
+    "command": "/ping",
+    "text": "",
+    "response_url": "https://hooks.slack.com/commands/xxx"
+  },
+  "self_ping_command": {
+    "team_id": "T12345",
+    "channel_id": "C123456",
+    "user_id": "U123456",
+    "command": "/ping",
+    "text": "<@U123456>",
+    "response_url": "https://hooks.slack.com/commands/xxx"
+  },
+  "bot_ping_command": {
+    "team_id": "T12345",
+    "channel_id": "C123456",
+    "user_id": "U123456",
+    "command": "/ping",
+    "text": "<@UBOT123>",
+    "response_url": "https://hooks.slack.com/commands/xxx"
+  },
+  "invalid_user_command": {
+    "team_id": "T12345",
+    "channel_id": "C123456",
+    "user_id": "U123456",
+    "command": "/ping",
+    "text": "@nonexistent",
+    "response_url": "https://hooks.slack.com/commands/xxx"
+  }
+}

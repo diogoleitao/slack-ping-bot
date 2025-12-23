@@ -1,6 +1,7 @@
 plugins:
   - rubocop-performance
   - rubocop-rake
+  - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 3.4
@@ -13,6 +14,9 @@ AllCops:
     - 'bin/**/*'
     - 'db/schema.rb'
     - '.git/**/*'
+    - 'spec/examples.txt'
+    - 'coverage/**/*'
+    - 'spec/vcr_cassettes/**/*'
 
 # String literals: single quotes by default
 Style/StringLiterals:
@@ -67,3 +71,19 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Enabled: true
+
+# RSpec-specific configuration
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MessageSpies:
+  EnforcedStyle: receive

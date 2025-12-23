@@ -1,0 +1,90 @@
+{
+  "users_list_success": {
+    "ok": true,
+    "members": [
+      {
+        "id": "U123456",
+        "name": "johndoe",
+        "real_name": "John Doe",
+        "is_bot": false,
+        "deleted": false,
+        "profile": {
+          "display_name": "john",
+          "real_name": "John Doe",
+          "email": "john@example.com"
+        }
+      },
+      {
+        "id": "U789ABC",
+        "name": "janedoe",
+        "real_name": "Jane Doe",
+        "is_bot": false,
+        "deleted": false,
+        "profile": {
+          "display_name": "jane",
+          "real_name": "Jane Doe",
+          "email": "jane@example.com"
+        }
+      },
+      {
+        "id": "UBOT123",
+        "name": "slackbot",
+        "real_name": "Slackbot",
+        "is_bot": true,
+        "deleted": false,
+        "profile": {
+          "display_name": "slackbot",
+          "real_name": "Slackbot"
+        }
+      }
+    ],
+    "cache_ts": 1234567890
+  },
+  "users_info_success": {
+    "ok": true,
+    "user": {
+      "id": "U123456",
+      "name": "johndoe",
+      "real_name": "John Doe",
+      "is_bot": false,
+      "deleted": false,
+      "profile": {
+        "display_name": "john",
+        "real_name": "John Doe"
+      }
+    }
+  },
+  "chat_post_message_success": {
+    "ok": true,
+    "channel": "D123456",
+    "ts": "1234567890.123456",
+    "message": {
+      "type": "message",
+      "text": "👋 Ping from <@U123456>",
+      "ts": "1234567890.123456"
+    }
+  },
+  "chat_delete_success": {
+    "ok": true,
+    "channel": "D123456",
+    "ts": "1234567890.123456"
+  },
+  "conversations_open_success": {
+    "ok": true,
+    "channel": {
+      "id": "D123456"
+    }
+  },
+  "error_user_not_found": {
+    "ok": false,
+    "error": "user_not_found"
+  },
+  "error_channel_not_found": {
+    "ok": false,
+    "error": "channel_not_found"
+  },
+  "error_account_inactive": {
+    "ok": false,
+    "error": "account_inactive"
+  }
+}
