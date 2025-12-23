@@ -4,6 +4,8 @@ This directory contains git hooks for enforcing project standards.
 
 ## Overview
 
+**pre-commit** - Validates Ruby code quality with RuboCop before commit.
+
 **commit-msg** - Validates commit messages against [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
 
 ## Installation
@@ -18,7 +20,28 @@ This copies hooks from `.git-hooks/` to `.git/hooks/` and makes them executable.
 
 ## Validation Rules
 
-### Valid Formats
+### RuboCop Linting
+
+**Enforces:**
+- Single quotes for strings (double for interpolation)
+- 120 character line length
+- Code style consistency
+- Performance best practices
+- No code comments
+
+**Auto-fix violations:**
+```bash
+bundle exec rubocop -A path/to/file.rb
+```
+
+**Bypass pre-commit (emergency only):**
+```bash
+git commit --no-verify
+```
+
+### Conventional Commits
+
+**Valid Formats**
 
 ```
 type(scope): subject
@@ -41,27 +64,32 @@ git commit -m "feat add feature"           # Missing colon
 git commit -m "update: change something"   # Invalid type
 ```
 
-## Bypass Hook (Emergency Only)
+## Bypass Hooks (Emergency Only)
 
 ```bash
 git commit --no-verify -m "WIP: temp commit"
 ```
 
-⚠️ **Warning:** Only use `--no-verify` for temporary local commits. All PR commits must follow the format.
+⚠️ **Warning:** Only use `--no-verify` for temporary local commits. All PR commits must pass both hooks.
 
 ## Troubleshooting
 
-**Hook not working?**
+**Hooks not working?**
 
 ```bash
-# Check hook exists
+# Check hooks exist
+ls -l .git/hooks/pre-commit
 ls -l .git/hooks/commit-msg
 
 # Reinstall
 ./git-hooks/install.sh
 
-# Test directly
+# Test commit-msg directly
 echo "feat: test" | .git/hooks/commit-msg /dev/stdin
+
+# Test pre-commit directly
+git add file.rb
+.git/hooks/pre-commit
 ```
 
 ## Reference

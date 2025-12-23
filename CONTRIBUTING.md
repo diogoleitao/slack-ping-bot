@@ -145,6 +145,53 @@ git push origin feat/your-feature-name
 
 ## Code Style
 
+### RuboCop
+
+**All Ruby code must pass RuboCop linting before commit.**
+
+Run RuboCop:
+
+```bash
+# Check all files
+bundle exec rubocop
+
+# Check specific files
+bundle exec rubocop lib/slack_client.rb
+
+# Auto-fix safe offenses only (conservative)
+bundle exec rubocop -A
+
+# Check offense counts by type
+bundle exec rubocop --format offenses
+```
+
+**Code style enforced:**
+- Single quotes for strings (double for interpolation)
+- 120 character line length max
+- No code comments (code should be self-documenting)
+
+**Pre-commit hook:**
+
+RuboCop runs automatically on staged Ruby files before commit.
+
+```bash
+# Fix violations before committing
+bundle exec rubocop -A path/to/file.rb
+
+# Verify fixes
+bundle exec rubocop path/to/file.rb
+
+# Commit
+git commit -m "feat: your message"
+```
+
+**Bypass hook (emergency only):**
+```bash
+git commit --no-verify
+```
+
+⚠️ **Warning:** Bypassing is for temporary local commits only. All PR commits must pass RuboCop.
+
 ### Ruby Style
 
 - **Ruby version:** 3.4.x

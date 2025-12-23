@@ -1,5 +1,4 @@
 #!/bin/bash
-# Install git hooks for conventional commits validation
 
 HOOKS_DIR=".git/hooks"
 SOURCE_DIR=".git-hooks"
@@ -18,11 +17,21 @@ echo ""
 
 cp "$SOURCE_DIR/commit-msg" "$HOOKS_DIR/commit-msg"
 chmod +x "$HOOKS_DIR/commit-msg"
+echo "  ✅ commit-msg hook installed"
 
+cp "$SOURCE_DIR/pre-commit" "$HOOKS_DIR/pre-commit"
+chmod +x "$HOOKS_DIR/pre-commit"
+echo "  ✅ pre-commit hook installed"
+
+echo ""
 echo "✅ Git hooks installed successfully"
 echo ""
-echo "📋 Commit messages will now be validated against Conventional Commits format."
+echo "📋 Hooks active:"
+echo "  - pre-commit: RuboCop linting on staged files"
+echo "  - commit-msg: Conventional Commits validation"
+echo ""
 echo "📖 See CONTRIBUTING.md for complete guidelines."
 echo ""
-echo "Test the hook:"
-echo "  git commit --allow-empty -m \"test: verify hook works\""
+echo "Test the hooks:"
+echo "  git commit --allow-empty -m \"test: verify hooks work\""
+echo ""

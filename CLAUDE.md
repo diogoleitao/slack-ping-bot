@@ -123,6 +123,30 @@ Cannot ping:
 
 ## Code Conventions
 
+### RuboCop
+
+**Linting:** RuboCop with `rubocop-performance` and `rubocop-rake` extensions
+
+**Configuration:**
+- Single quotes for strings, double for interpolation
+- 120 character line length
+- No code comments (code should be self-documenting)
+- Documentation comments disabled
+- Adjusted metrics: MethodLength max 40, AbcSize max 25, ParameterLists max 6
+- Pre-commit hook blocks commits on violations (skippable with `--no-verify`)
+
+**Run linting:**
+```bash
+bundle exec rubocop              # Check all files
+bundle exec rubocop -A           # Auto-fix safe offenses
+bundle exec rubocop lib/*.rb     # Check specific files
+bundle exec rubocop --format offenses  # View counts by type
+```
+
+**Configuration file:** `.rubocop.yml`
+
+**Pre-commit hook:** `.git-hooks/pre-commit` (runs on staged Ruby files)
+
 ### Logging Style
 
 **Before (removed):**
@@ -132,7 +156,7 @@ puts "[INFO] Message sent"
 
 **After (current):**
 ```ruby
-logger.info("Message sent", user_id: user_id, channel: channel)
+logger.info('Message sent', user_id: user_id, channel: channel)
 ```
 
 **Output format:**
@@ -144,8 +168,8 @@ logger.info("Message sent", user_id: user_id, channel: channel)
 
 All errors return structured hash:
 ```ruby
-{ success: false, error: "User not found" }
-{ success: true, message: "Pinged <@U123>" }
+{ success: false, error: 'User not found' }
+{ success: true, message: 'Pinged <@U123>' }
 ```
 
 ### Module Pattern
@@ -233,11 +257,27 @@ Current levels: trace, debug, info, warn, error, fatal
 
 To add custom structured fields:
 ```ruby
-logger.info("Event name", 
+logger.info('Event name',
   required_field: value,
   optional_field: value,
-  context: { nested: "data" }
+  context: { nested: 'data' }
 )
+```
+
+### Running RuboCop
+
+```bash
+# Full audit
+bundle exec rubocop
+
+# Auto-fix safe offenses
+bundle exec rubocop -A
+
+# Check single file
+bundle exec rubocop app.rb
+
+# Fix all staged files before commit
+git diff --cached --name-only | grep '\.rb$' | xargs bundle exec rubocop -A
 ```
 
 ---
@@ -364,6 +404,15 @@ ruby --version  # Should show 3.4.8
 
 # Verify gems
 bundle exec ruby -e "require 'ougai'; puts 'OK'"
+
+# Lint all files
+bundle exec rubocop
+
+# Lint with offense counts
+bundle exec rubocop --format offenses
+
+# Lint only changed files
+git diff --name-only main | grep '\.rb$' | xargs bundle exec rubocop
 ```
 
 ---

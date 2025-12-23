@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "🔍 Running RuboCop on staged files..."
+
+files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.rb$')
+
+if [ -z "$files" ]; then
+    echo "✅ No Ruby files staged"
+    exit 0
+fi
+
+if ! bundle exec rubocop $files; then
+    echo ""
+    echo "❌ RuboCop found violations"
+    echo ""
+    echo "Fix violations before committing:"
+    echo "  bundle exec rubocop -A $files    # Auto-fix safe offenses"
+    echo "  bundle exec rubocop $files       # Check again"
+    echo ""
+    echo "Or bypass hook (emergency only):"
+    echo "  git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+echo "✅ RuboCop passed"

@@ -1,0 +1,69 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'node_modules/**/*'
+    - 'bin/**/*'
+    - 'db/schema.rb'
+    - '.git/**/*'
+
+# String literals: single quotes by default
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+# String literals in interpolation: double quotes
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# Line length: 120 characters
+Layout/LineLength:
+  Max: 120
+
+# Disable documentation requirements
+Style/Documentation:
+  Enabled: false
+
+# Disable predicate method name enforcement
+Naming/PredicateMethod:
+  Enabled: false
+
+# Default complexity metrics (with adjusted MethodLength)
+Metrics/AbcSize:
+  Enabled: true
+  Max: 25
+
+Metrics/BlockLength:
+  Enabled: true
+  Exclude:
+    - 'config/**/*'
+    - 'spec/**/*'
+    - 'app.rb'
+
+Metrics/ClassLength:
+  Enabled: true
+
+Metrics/CyclomaticComplexity:
+  Enabled: true
+
+Metrics/MethodLength:
+  Enabled: true
+  Max: 40
+
+Metrics/ModuleLength:
+  Enabled: true
+
+Metrics/ParameterLists:
+  Enabled: true
+  Max: 6
+
+Metrics/PerceivedComplexity:
+  Enabled: true

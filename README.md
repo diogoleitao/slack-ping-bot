@@ -325,8 +325,8 @@ echo $RUBY_YJIT_ENABLE
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines including:
 - Conventional Commits format
-- Git hooks setup
-- Code style guidelines
+- Git hooks setup (commit-msg + pre-commit)
+- RuboCop code style enforcement
 - Pull request process
 
 ## Versioning

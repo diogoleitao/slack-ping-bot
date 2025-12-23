@@ -1,26 +1,25 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-ruby "~> 3.4.0"
+ruby '~> 3.4.0'
 
-# Web framework
-gem "sinatra", "~> 4.2"
-gem "puma", "~> 7.1"
+gem 'puma', '~> 7.1'
+gem 'sinatra', '~> 4.2'
 
-# Slack integration
-gem "slack-ruby-client", "~> 3.1"
+gem 'slack-ruby-client', '~> 3.1'
 
-# Redis for rate limiting
-gem "redis", "~> 5.4"
+gem 'redis', '~> 5.4'
 
-# Environment variables
-gem "dotenv", "~> 3.2"
+gem 'dotenv', '~> 3.2'
 
-# Structured JSON logging
-gem "ougai", "~> 2.0"
+gem 'ougai', '~> 2.0'
 
 group :development do
-  gem "pry", "~> 0.15"
-  gem "rerun", "~> 0.14"  # Auto-reload on file changes
+  gem 'pry', '~> 0.15'
+  gem 'rerun', '~> 0.14'
+
+  gem 'rubocop', '~> 1.70', require: false
+  gem 'rubocop-performance', '~> 1.23', require: false
+  gem 'rubocop-rake', '~> 0.6', require: false
 end
