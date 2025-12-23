@@ -255,6 +255,52 @@ Include:
 - Update PR based on feedback
 - Squash commits if requested
 
+## Versioning
+
+This project uses [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
+
+**Current version:** `0.1.0` (stored in `VERSION` file and `lib/version.rb`)
+
+**Check version:**
+```bash
+cat VERSION
+curl http://localhost:4567/version
+```
+
+**Version bumps** are automated based on conventional commits:
+
+| Commit Type | Version Bump |
+|-------------|--------------|
+| `feat!:` or `fix!:` (breaking) | MAJOR |
+| `feat:` (new feature) | MINOR |
+| `fix:` (bug fix) | PATCH |
+| Others (`docs:`, `chore:`, etc.) | None |
+
+**Manual release process:**
+```bash
+# 1. Update version files
+echo "0.2.0" > VERSION
+sed -i '' 's/VERSION = ".*"/VERSION = "0.2.0"/' lib/version.rb
+
+# 2. Update CHANGELOG.md (move items from [Unreleased] to new version section)
+
+# 3. Commit and tag
+git add VERSION lib/version.rb CHANGELOG.md
+git commit -m "chore(release): bump version to 0.2.0"
+git tag v0.2.0
+git push origin main --tags
+
+# 4. Create GitHub release
+gh release create v0.2.0 --title "v0.2.0" --notes "See CHANGELOG.md"
+```
+
+**Resources:**
+- [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Keep a Changelog](https://keepachangelog.com/)
+
+**Automated releases:** See `docs/TODO.md` section 7 for CI/CD setup details.
+
 ## Bypassing Git Hooks
 
 In **emergency situations only**, you can bypass the commit hook:

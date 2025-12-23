@@ -5,6 +5,7 @@ require "json"
 require "dotenv/load"
 require "ougai"
 
+require_relative "lib/version"
 require_relative "lib/slack_verifier"
 require_relative "lib/slack_client"
 require_relative "lib/rate_limiter"
@@ -28,6 +29,16 @@ rate_limiter = RateLimiter.new(ENV.fetch("REDIS_URL", "redis://localhost:6379/0"
 get "/" do
   content_type :json
   { status: "ok", service: "slack-ping-bot" }.to_json
+end
+
+# Version endpoint
+get "/version" do
+  content_type :json
+  {
+    version: SlackPingBot::VERSION,
+    commit_sha: SlackPingBot::BUILD_SHA,
+    build_date: SlackPingBot::BUILD_DATE
+  }.to_json
 end
 
 # Slack slash command endpoint

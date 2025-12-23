@@ -8,6 +8,13 @@ RUN apk add --no-cache \
 # Set working directory
 WORKDIR /app
 
+# Build arguments for version metadata
+ARG GIT_COMMIT_SHA=unknown
+ARG BUILD_DATE=unknown
+
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
+ENV BUILD_DATE=${BUILD_DATE}
+
 # Copy Gemfile and install gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install --without development

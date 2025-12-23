@@ -8,7 +8,11 @@ services:
     command: redis-server --save ""  # Pure in-memory, no persistence
 
   app:
-    build: .
+    build:
+      context: .
+      args:
+        GIT_COMMIT_SHA: ${GIT_COMMIT_SHA:-unknown}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
     ports:
       - "4567:4567"
     environment:
@@ -17,5 +21,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       RACK_ENV: production
       RUBY_YJIT_ENABLE: 1  # Enable YJIT in production
+      GIT_COMMIT_SHA: ${GIT_COMMIT_SHA:-unknown}
+      BUILD_DATE: ${BUILD_DATE:-unknown}
     depends_on:
       - redis

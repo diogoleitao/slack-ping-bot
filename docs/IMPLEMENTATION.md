@@ -21,7 +21,7 @@
 
 A high-performance Slack bot that sends notification pings without persistent messages. Messages are sent and deleted within 100-200ms, but notifications persist.
 
-**Core Application Files: 16 files**
+**Core Application Files: 19 files**
 
 #### Configuration Files
 1. **Gemfile** - Ruby 3.4 dependencies with latest gem versions
@@ -32,20 +32,23 @@ A high-performance Slack bot that sends notification pings without persistent me
 6. **config.ru** - Rack configuration
 7. **docker-compose.yml** - Multi-container setup (app + Redis)
 8. **Dockerfile** - Ruby 3.4 Alpine container with YJIT
+9. **VERSION** - Semantic version number (plain text)
 
 #### Application Code
-9. **app.rb** - Main Sinatra application with Slack endpoints
-10. **config/puma.rb** - Puma web server configuration with YJIT notes
+10. **app.rb** - Main Sinatra application with Slack and version endpoints
+11. **config/puma.rb** - Puma web server configuration with YJIT notes
 
 #### Business Logic (lib/)
-11. **lib/slack_verifier.rb** - Request signature verification (security)
-12. **lib/slack_client.rb** - Slack API wrapper with user caching
-13. **lib/rate_limiter.rb** - Redis-backed rate limiting with in-memory fallback
-14. **lib/user_resolver.rb** - User mention parsing and validation
-15. **lib/ping_handler.rb** - Core ping orchestration logic
+12. **lib/version.rb** - Version module with build metadata
+13. **lib/slack_verifier.rb** - Request signature verification (security)
+14. **lib/slack_client.rb** - Slack API wrapper with user caching
+15. **lib/rate_limiter.rb** - Redis-backed rate limiting with in-memory fallback
+16. **lib/user_resolver.rb** - User mention parsing and validation
+17. **lib/ping_handler.rb** - Core ping orchestration logic
 
 #### Documentation
-16. **README.md** - Complete user and developer documentation
+18. **README.md** - Complete user and developer documentation
+19. **CHANGELOG.md** - Version history and release notes
 
 ### Requirements Confirmed
 
@@ -210,6 +213,8 @@ slack-ping-bot/
 ├── .env.example                    # Environment variables template
 ├── .gitignore                      # Git ignore rules
 ├── .ruby-version                   # Ruby version specification
+├── VERSION                         # Semantic version number
+├── CHANGELOG.md                    # Version history and release notes
 ├── Gemfile                         # Ruby dependencies (Ruby 3.4)
 ├── Gemfile.lock                    # Dependency lock file
 ├── config.ru                       # Rack configuration
@@ -221,6 +226,7 @@ slack-ping-bot/
 ├── config/
 │   └── puma.rb                    # Puma server configuration
 └── lib/
+    ├── version.rb                 # Version module with build metadata
     ├── slack_verifier.rb          # Request signature verification
     ├── slack_client.rb            # Slack API wrapper
     ├── rate_limiter.rb            # Rate limiting (Redis + fallback)
@@ -245,7 +251,31 @@ slack-ping-bot/
 5. Return ephemeral success/error to sender
 ```
 
+### API Endpoints
+
+**Health Check:**
+- `GET /` - Returns `{"status":"ok","service":"slack-ping-bot"}`
+
+**Version Info:**
+- `GET /version` - Returns version, commit SHA, and build date
+  ```json
+  {
+    "version": "0.1.0",
+    "commit_sha": "abc123d",
+    "build_date": "2025-12-23 15:30:45 UTC"
+  }
+  ```
+
+**Slack Commands:**
+- `POST /slack/commands` - Handles `/ping` slash command
+
 ### Module Responsibilities
+
+**SlackPingBot::Version**
+- Provides version constants and build metadata
+- Tracks commit SHA and build date
+- Supports environment variable overrides for CI/CD
+- Graceful fallback to git command or "unknown"
 
 **SlackVerifier**
 - Security: Verify request signatures
@@ -431,7 +461,68 @@ end
 
 ---
 
-### 5.3 lib/slack_verifier.rb (Security)
+### 5.3 lib/version.rb (Version Module)
+
+**Purpose:** Provides version constants and build metadata for the application.
+
+**File:** `lib/version.rb`
+
+```ruby
+# frozen_string_literal: true
+
+module SlackPingBot
+  VERSION = "0.1.0"
+  
+  # Build metadata (set during deployment/build process)
+  BUILD_SHA = ENV.fetch("GIT_COMMIT_SHA", 
+    begin
+      `git rev-parse --short HEAD 2>/dev/null`.strip
+    rescue
+      "unknown"
+    end
+  )
+  
+  BUILD_DATE = ENV.fetch("BUILD_DATE", Time.now.utc.strftime("%Y-%m-%d %H:%M:%S UTC"))
+  
+  def self.version_string
+    "v#{VERSION} (#{BUILD_SHA} @ #{BUILD_DATE})"
+  end
+end
+```
+
+**Key Features:**
+- **VERSION**: Semantic version constant (MAJOR.MINOR.PATCH)
+- **BUILD_SHA**: Commit SHA from environment or git command
+- **BUILD_DATE**: Build timestamp from environment or current time
+- **Graceful fallbacks**: Works without git or environment variables
+- **version_string**: Formatted version info for logging and display
+
+**Environment Variables:**
+- `GIT_COMMIT_SHA` (optional): Override commit SHA (for CI/CD)
+- `BUILD_DATE` (optional): Override build date (for CI/CD)
+
+**Usage:**
+```ruby
+# In application code
+require_relative 'lib/version'
+puts SlackPingBot::VERSION         # => "0.1.0"
+puts SlackPingBot::BUILD_SHA       # => "abc123d"
+puts SlackPingBot.version_string   # => "v0.1.0 (abc123d @ 2025-12-23 15:30:45 UTC)"
+
+# Via version endpoint
+curl http://localhost:4567/version
+# {"version":"0.1.0","commit_sha":"abc123d","build_date":"2025-12-23 15:30:45 UTC"}
+```
+
+**Versioning:**
+- Follows [Semantic Versioning 2.0.0](https://semver.org/)
+- Version bumps automated based on conventional commits
+- See CONTRIBUTING.md for complete versioning guidelines
+- Version history tracked in CHANGELOG.md
+
+---
+
+### 5.5 lib/slack_client.rb (Slack API Wrapper)
 
 ```ruby
 # frozen_string_literal: true
@@ -486,7 +577,7 @@ end
 
 ---
 
-### 5.4 lib/slack_client.rb (Slack API Wrapper)
+### 5.5 lib/slack_client.rb (Slack API Wrapper)
 
 ```ruby
 # frozen_string_literal: true
@@ -588,7 +679,7 @@ end
 
 ---
 
-### 5.5 lib/rate_limiter.rb (Rate Limiting with Redis + In-Memory Fallback)
+### 5.6 lib/rate_limiter.rb (Rate Limiting with Redis + In-Memory Fallback)
 
 ```ruby
 # frozen_string_literal: true
@@ -686,7 +777,7 @@ end
 
 ---
 
-### 5.6 lib/user_resolver.rb (Parse and Resolve Target User)
+### 5.7 lib/user_resolver.rb (Parse and Resolve Target User)
 
 ```ruby
 # frozen_string_literal: true
@@ -784,7 +875,7 @@ end
 
 ---
 
-### 5.7 lib/ping_handler.rb (Core Ping Orchestration)
+### 5.8 lib/ping_handler.rb (Core Ping Orchestration)
 
 ```ruby
 # frozen_string_literal: true
@@ -859,7 +950,7 @@ end
 
 ---
 
-### 5.8 config.ru (Rack Configuration)
+### 5.9 config.ru (Rack Configuration)
 
 ```ruby
 # frozen_string_literal: true
@@ -871,7 +962,7 @@ run Sinatra::Application
 
 ---
 
-### 5.9 config/puma.rb (Puma Server Configuration)
+### 5.10 config/puma.rb (Puma Server Configuration)
 
 ```ruby
 # frozen_string_literal: true
@@ -898,7 +989,7 @@ stdout_redirect stdout: true, stderr: true, append: true
 
 ---
 
-### 5.10 Dockerfile
+### 5.11 Dockerfile
 
 ```dockerfile
 FROM ruby:3.4-alpine
@@ -930,7 +1021,7 @@ CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
 
 ---
 
-### 5.11 .env.example
+### 5.12 .env.example
 
 ```bash
 # Slack credentials (required)
@@ -958,7 +1049,7 @@ LOG_LEVEL=info
 
 ---
 
-### 5.12 .gitignore
+### 5.13 .gitignore
 
 ```
 # Environment variables
@@ -994,7 +1085,7 @@ Thumbs.db
 
 ---
 
-### 5.13 docker-compose.yml
+### 5.14 docker-compose.yml
 
 ```yaml
 version: '3.8'
@@ -1023,11 +1114,79 @@ services:
 
 ---
 
-### 5.14 .ruby-version
+### 5.15 .ruby-version
 
 ```
 3.4.8
 ```
+
+---
+
+### 5.16 VERSION
+
+Simple text file containing the current semantic version.
+
+```
+0.1.0
+```
+
+**Purpose:**
+- Single source of truth for version number
+- Easy to parse in shell scripts and CI/CD
+- Used alongside lib/version.rb Ruby constant
+
+**Usage:**
+```bash
+# Read version
+cat VERSION
+
+# Use in scripts
+VERSION=$(cat VERSION)
+docker build -t slack-ping-bot:$VERSION .
+```
+
+---
+
+### 5.17 CHANGELOG.md
+
+**Purpose:** Track all notable changes to the project following [Keep a Changelog](https://keepachangelog.com/) format.
+
+**Format:**
+- **Added**: New features
+- **Changed**: Changes in existing functionality
+- **Deprecated**: Soon-to-be removed features
+- **Removed**: Removed features
+- **Fixed**: Bug fixes
+- **Security**: Vulnerability fixes
+
+**Maintenance:**
+- Manual updates go under `## [Unreleased]` section
+- Automated generation from conventional commits (future)
+- Version sections added during releases
+- Links to GitHub releases and comparisons
+
+**Example Entry:**
+```markdown
+## [0.1.0] - 2025-12-23
+
+### Added
+- Initial implementation of Slack Ping Bot
+- Ephemeral ping functionality with 150ms message deletion
+- Rate limiting: 3 pings per minute per sender
+
+### Security
+- Request signature validation prevents unauthorized access
+- Replay attack protection (reject requests >5min old)
+
+[0.1.0]: https://github.com/diogoleitao/slack-ping-bot/releases/tag/v0.1.0
+```
+
+**Automation (Future):**
+- Use tools like standard-version, semantic-release, or release-please
+- Automatically generate changelog entries from conventional commits
+- Update during automated release process
+
+See CONTRIBUTING.md for complete versioning guidelines.
 
 ---
 
@@ -1376,27 +1535,27 @@ ngrok http 4567
 
 ### Docker Deployment
 
-**Build Image:**
+**Build with version metadata:**
 ```bash
-docker build -t slack-ping-bot .
+docker build \
+  --build-arg GIT_COMMIT_SHA=$(git rev-parse --short HEAD) \
+  --build-arg BUILD_DATE="$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+  -t slack-ping-bot:0.1.0 \
+  -t slack-ping-bot:$(git rev-parse --short HEAD) \
+  -t slack-ping-bot:latest \
+  .
 ```
 
 **Run with Docker Compose:**
 ```bash
-# Includes Redis + App with YJIT enabled
+export GIT_COMMIT_SHA=$(git rev-parse --short HEAD)
+export BUILD_DATE="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
 docker-compose up -d
 ```
 
-**Run Standalone Container:**
+**Check version:**
 ```bash
-docker run -d \
-  -p 4567:4567 \
-  -e SLACK_BOT_TOKEN=xoxb-... \
-  -e SLACK_SIGNING_SECRET=... \
-  -e REDIS_URL=redis://your-redis:6379/0 \
-  -e RUBY_YJIT_ENABLE=1 \
-  -e LOG_LEVEL=info \
-  slack-ping-bot
+curl http://localhost:4567/version
 ```
 
 ### Deployment Options

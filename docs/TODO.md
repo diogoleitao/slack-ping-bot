@@ -96,11 +96,85 @@ All core implementation complete. The following items remain before production d
 - [ ] Document any deployment gotchas
 - [ ] Add monitoring/alerting setup guide
 
+### 7. Release Management
+
+**Once deployed to production, establish release process:**
+
+- [ ] Choose changelog automation tool:
+  - [ ] [standard-version](https://github.com/conventional-changelog/standard-version) (npm-based, simple)
+  - [ ] [semantic-release](https://github.com/semantic-release/semantic-release) (full automation)
+  - [ ] [release-please](https://github.com/googleapis/release-please) (GitHub Actions native)
+  
+- [ ] Set up GitHub Actions for automated releases:
+  - [ ] Create `.github/workflows/release.yml`
+  - [ ] Trigger on push to `main` branch
+  - [ ] Analyze commits since last tag
+  - [ ] Bump version in `VERSION` and `lib/version.rb`
+  - [ ] Update `CHANGELOG.md` from commit messages
+  - [ ] Create git tag and GitHub release
+  - [ ] Optional: Deploy to production automatically
+
+- [ ] Configure branch protection rules:
+  - [ ] Require pull request reviews
+  - [ ] Require status checks to pass
+  - [ ] Require conventional commit format
+  - [ ] Prevent force pushes to `main`
+
+- [ ] First production release (v1.0.0):
+  - [ ] All manual testing checklist complete (section 3)
+  - [ ] Deployed to production (section 4)
+  - [ ] Monitoring set up (section 5)
+  - [ ] Documentation complete (section 6)
+  - [ ] Tag as `v1.0.0`: `git tag v1.0.0 && git push --tags`
+  - [ ] Create GitHub release with changelog
+
+**Manual release checklist (until CI/CD ready):**
+
+1. Review commits since last release:
+   ```bash
+   git log v0.1.0..HEAD --oneline
+   ```
+
+2. Determine version bump based on commits:
+   - Any `feat!:` or `fix!:` → MAJOR
+   - Any `feat:` → MINOR
+   - Only `fix:` → PATCH
+
+3. Update version files:
+   ```bash
+   echo "0.2.0" > VERSION
+   sed -i '' 's/VERSION = ".*"/VERSION = "0.2.0"/' lib/version.rb
+   ```
+
+4. Update `CHANGELOG.md`:
+   - Move items from `[Unreleased]` to new version section
+   - Add date: `## [0.2.0] - 2025-12-23`
+   - Update comparison links at bottom
+
+5. Commit version bump:
+   ```bash
+   git add VERSION lib/version.rb CHANGELOG.md
+   git commit -m "chore(release): bump version to 0.2.0"
+   ```
+
+6. Create and push tag:
+   ```bash
+   git tag v0.2.0
+   git push origin main --tags
+   ```
+
+7. Create GitHub release:
+   ```bash
+   gh release create v0.2.0 \
+     --title "v0.2.0" \
+     --notes-file <(sed -n '/## \[0.2.0\]/,/## \[/p' CHANGELOG.md | head -n -1)
+   ```
+
 ---
 
 ## Low Priority (Future Enhancements)
 
-### 7. Automated Testing
+### 8. Automated Testing
 - [ ] Set up RSpec test framework
 - [ ] Write unit tests for all modules:
   - [ ] `spec/lib/slack_verifier_spec.rb`
@@ -113,13 +187,13 @@ All core implementation complete. The following items remain before production d
 - [ ] Set up CI/CD pipeline
 - [ ] Add test coverage reporting
 
-### 8. Performance Testing
+### 9. Performance Testing
 - [ ] Run load tests (Apache Bench or similar)
 - [ ] Verify YJIT performance gains
 - [ ] Test with high concurrent load
 - [ ] Optimize if needed
 
-### 9. Additional Features (Out of Scope)
+### 10. Additional Features (Out of Scope)
 
 *These were explicitly excluded from initial requirements but could be added later:*
 
@@ -281,4 +355,4 @@ git commit --no-verify -m "WIP: temp commit"
 ---
 
 **Last Updated:** December 23, 2025  
-**Status:** Implementation complete, awaiting git setup and Slack app configuration
+**Status:** Implementation complete, awaiting Slack app configuration and first release (v0.1.0)

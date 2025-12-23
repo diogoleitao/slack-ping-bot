@@ -396,6 +396,22 @@ docs: update installation steps
 
 See `CONTRIBUTING.md` for complete guidelines.
 
+### Semantic Versioning
+
+This project uses [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
+
+**Current version:** `0.1.0` (stored in `VERSION` and `lib/version.rb`)
+
+**Version bumps** based on conventional commits:
+- `feat!:` or `fix!:` → MAJOR (breaking changes)
+- `feat:` → MINOR (new features)
+- `fix:` → PATCH (bug fixes)
+- Other types → No version change
+
+**Version 1.0.0 milestone:** First production deployment after completing `docs/TODO.md`
+
+**Release automation:** See `CONTRIBUTING.md` for manual process and `docs/TODO.md` section 7 for CI/CD setup.
+
 **When making changes:**
 1. Create feature branch: `git checkout -b feat/feature-name`
 2. Make changes and test

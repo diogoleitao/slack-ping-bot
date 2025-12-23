@@ -329,6 +329,27 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines including:
 - Code style guidelines
 - Pull request process
 
+## Versioning
+
+This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+**Current version:** `0.1.0` (pre-production)
+
+Check version:
+```bash
+# Via file
+cat VERSION
+
+# Via Ruby
+ruby -r ./lib/version -e "puts SlackPingBot.version_string"
+
+# Via API (when running)
+curl http://localhost:4567/version
+```
+
+**Version history:** See [CHANGELOG.md](CHANGELOG.md)  
+**Releases:** See [GitHub Releases](https://github.com/diogoleitao/slack-ping-bot/releases)
+
 ## License
 
 MIT License
