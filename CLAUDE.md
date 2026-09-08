@@ -15,10 +15,14 @@ This file provides context for AI assistants (Claude, ChatGPT, etc.) working on 
 ## Current Status
 
 **Implementation:** ✅ Complete  
-**Testing:** ⏳ Pending (see docs/TODO.md)  
-**Deployment:** ⏳ Pending (see docs/TODO.md)
+**Automated testing:** ✅ Complete (RSpec suite, 96% coverage)  
+**CI:** ⏳ Pending ([#2](https://github.com/diogoleitao/slack-ping-bot/issues/2))  
+**Manual test pass:** ⏳ Pending (`scripts/setup-slack.sh`)  
+**Deployment:** ⏳ Pending ([#9](https://github.com/diogoleitao/slack-ping-bot/issues/9))
 
-All code is written and functional. Dependencies installed. Ready for Slack app configuration and testing.
+All code is written and functional, with an RSpec unit and integration suite. Nothing runs the suite automatically yet, and the bot has never been deployed.
+
+Remaining work is tracked in [GitHub Issues](https://github.com/diogoleitao/slack-ping-bot/issues), not in this file. See `docs/agents/issue-tracker.md` for the conventions.
 
 ---
 
@@ -47,6 +51,8 @@ slack-ping-bot/
 │   └── ping_handler.rb    # Core orchestration logic
 ├── config/
 │   └── puma.rb            # Web server config
+├── scripts/
+│   └── setup-slack.sh     # Wizard: Slack app setup + 33-item manual test pass
 ├── Gemfile                # Ruby 3.4 dependencies
 ├── Dockerfile             # Ruby 3.4-alpine with YJIT
 ├── docker-compose.yml     # App + Redis setup
@@ -54,7 +60,10 @@ slack-ping-bot/
 ├── README.md              # User documentation
 ├── docs/
 │   ├── IMPLEMENTATION.md  # Complete technical docs (1,832 lines)
-│   └── TODO.md            # Roadmap and testing checklist (190 lines)
+│   └── agents/            # Per-repo config read by the engineering skills
+│       ├── issue-tracker.md   # Where issues live (GitHub, via gh CLI)
+│       ├── triage-labels.md   # Canonical triage label vocabulary
+│       └── domain.md          # CONTEXT.md / ADR consumer rules
 └── CLAUDE.md              # This file
 ```
 
@@ -241,8 +250,9 @@ ngrok http 4567
 ### Adding New Validation Rule
 
 1. Update `lib/user_resolver.rb#validate_user`
-2. Add test case to `docs/TODO.md` checklist
-3. Update error message docs in `README.md`
+2. Add a spec case to `spec/lib/user_resolver_spec.rb`
+3. Add the manual check to the validation stage of `scripts/setup-slack.sh`
+4. Update error message docs in `README.md`
 
 ### Changing Rate Limit
 
@@ -294,15 +304,19 @@ git diff --cached --name-only | grep '\.rb$' | xargs bundle exec rubocop -A
 | `lib/ping_handler.rb` | Orchestration | 70 | Coordinates all modules |
 | `README.md` | User docs | 424 | Installation, usage, troubleshooting |
 | `docs/IMPLEMENTATION.md` | Technical docs | 1,832 | Complete spec, all file contents |
-| `docs/TODO.md` | Roadmap | 190 | Testing checklist, deployment steps |
+| `scripts/setup-slack.sh` | Setup wizard | 380 | Slack app config + 33-item manual test pass |
+| `docs/agents/issue-tracker.md` | Skill config | - | Issues live in GitHub, `gh` CLI conventions |
+| `docs/agents/triage-labels.md` | Skill config | - | Triage role to label-string mapping |
+| `docs/agents/domain.md` | Skill config | - | How skills read `CONTEXT.md` and ADRs |
 | `CLAUDE.md` | This file | - | AI assistant context |
 
 ---
 
 ## Testing Strategy
 
-**Current:** Manual testing checklist (33 items in docs/TODO.md)  
-**Future:** RSpec unit + integration tests (see docs/TODO.md section 7)
+**Automated:** RSpec suite in `spec/` at 96% coverage. 5 unit specs under `spec/lib/`, 3 integration specs under `spec/integration/`, with fixtures, VCR cassettes and mock_redis. Run with `bundle exec rspec`.  
+**Manual:** 33-item checklist, driven by `scripts/setup-slack.sh`. Covers what specs cannot: that the 150ms delete window actually leaves a notification behind in a real workspace.  
+**CI:** not yet wired up. See [#2](https://github.com/diogoleitao/slack-ping-bot/issues/2).
 
 **Test with:**
 ```bash
@@ -339,23 +353,25 @@ git diff --cached --name-only | grep '\.rb$' | xargs bundle exec rubocop -A
 
 ## Known Limitations
 
-1. **No automated tests** - Manual checklist only
-2. **No ping history** - No persistence by design
-3. **Single workspace** - One Slack workspace per deployment
-4. **Fixed message format** - "👋 Ping from @user" only
-5. **No admin controls** - Configuration via environment variables
+1. **No ping history** - No persistence by design
+2. **Single workspace** - One Slack workspace per deployment
+3. **Fixed message format** - "👋 Ping from @user" only
+4. **No admin controls** - Configuration via environment variables
+5. **Rate limits are not durable without Redis** - The in-memory fallback resets counters on restart and is only correct for a single app instance
 
 ---
 
 ## Future Enhancements (Out of Scope)
 
-See `docs/TODO.md` section 9 for full list:
+Held in the icebox issue [#3](https://github.com/diogoleitao/slack-ping-bot/issues/3), none of them committed to:
 - Custom messages
 - Ping history/analytics
 - Admin controls
 - Scheduled pings
 - Multi-workspace support
 - Web dashboard
+
+Note that ping history, analytics and multi-workspace each contradict a current design decision, so none is a free addition.
 
 ---
 
@@ -457,14 +473,14 @@ This project uses [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.htm
 - `fix:` → PATCH (bug fixes)
 - Other types → No version change
 
-**Version 1.0.0 milestone:** First production deployment after completing `docs/TODO.md`
+**Version 1.0.0 milestone:** First production deployment. Tracked as [#16](https://github.com/diogoleitao/slack-ping-bot/issues/16), which lists what gates it.
 
-**Release automation:** See `CONTRIBUTING.md` for manual process and `docs/TODO.md` section 7 for CI/CD setup.
+**Release automation:** See `CONTRIBUTING.md` for the manual process and [#7](https://github.com/diogoleitao/slack-ping-bot/issues/7) for the automation that replaces it. No git tags exist yet, so `v0.1.0` needs tagging retroactively before the first automated release has a baseline.
 
 **When making changes:**
 1. Create feature branch: `git checkout -b feat/feature-name`
 2. Make changes and test
-3. Update relevant docs (README.md, docs/IMPLEMENTATION.md, docs/TODO.md)
+3. Update relevant docs (README.md, docs/IMPLEMENTATION.md)
 4. Commit following conventional format
 5. Merge to main when tested
 
@@ -475,13 +491,12 @@ This project uses [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.htm
 When starting a new session, consider asking:
 
 1. **"What do you want to work on?"**
-   - Testing? (see docs/TODO.md section 3)
-   - Deployment? (see docs/TODO.md section 4)
-   - New feature? (see docs/TODO.md section 9)
+   - Check the unblocked issues first: `gh issue list --state open` and drop any with an open blocker
+   - Right now the frontier is [#1](https://github.com/diogoleitao/slack-ping-bot/issues/1) (pick a platform), [#2](https://github.com/diogoleitao/slack-ping-bot/issues/2) (wire up CI) and [#3](https://github.com/diogoleitao/slack-ping-bot/issues/3) (triage the icebox)
    - Bug fix?
 
 2. **"Is the Slack app configured?"**
-   - If no: Guide through docs/TODO.md section 1
+   - If no: run `scripts/setup-slack.sh`, which walks the whole procedure
    - If yes: Proceed with testing
 
 3. **"Any errors in the logs?"**
@@ -505,7 +520,7 @@ code .          # Or cursor .
 **Read documentation:**
 - User guide: `README.md`
 - Technical details: `docs/IMPLEMENTATION.md`
-- Next steps: `docs/TODO.md`
+- Next steps: [GitHub Issues](https://github.com/diogoleitao/slack-ping-bot/issues)
 - This context: `CLAUDE.md`
 
 **Environment:**
@@ -520,7 +535,7 @@ code .          # Or cursor .
 When starting a new session:
 
 1. **This file (CLAUDE.md)** - You're here! ✓
-2. **docs/TODO.md** - See what's next
+2. **`gh issue list --state open`** - See what's next
 3. **app.rb** - Understand request flow
 4. **lib/ping_handler.rb** - Core business logic
 
@@ -529,6 +544,22 @@ For deep dive:
 
 ---
 
-**Last Updated:** December 23, 2025  
-**Status:** Implementation complete, ready for Slack app configuration and testing  
-**Next Step:** Follow docs/TODO.md section 1 (Slack App Configuration)
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues in `diogoleitao/slack-ping-bot`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage labels, unrenamed: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+---
+
+**Last Updated:** September 8, 2026  
+**Status:** Implementation and automated test suite complete. Not yet deployed, no CI.  
+**Next Step:** Work the unblocked issues: [#1](https://github.com/diogoleitao/slack-ping-bot/issues/1) pick a deployment platform, [#2](https://github.com/diogoleitao/slack-ping-bot/issues/2) wire up CI. For the Slack app itself, run `scripts/setup-slack.sh`.

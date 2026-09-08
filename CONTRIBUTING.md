@@ -262,11 +262,21 @@ Before submitting your PR:
 - [ ] Check logs for errors or warnings
 - [ ] Verify Redis fallback works (if applicable)
 
-See `docs/TODO.md` for complete manual testing checklist.
+For the complete 33-item manual checklist, run `scripts/setup-slack.sh`. It walks the Slack app setup and then each test group in turn, recording anything that failed.
 
-### Automated Tests (Future)
+### Automated Tests
 
-Unit tests with RSpec are planned. See `docs/TODO.md` section 7.
+An RSpec suite already exists at 96% coverage:
+
+```bash
+bundle exec rspec                       # everything
+bundle exec rspec spec/lib              # unit specs only
+bundle exec rspec spec/integration      # integration specs only
+```
+
+5 unit specs live under `spec/lib/`, 3 integration specs under `spec/integration/`, with fixtures in `spec/fixtures/`, VCR cassettes for Slack API calls, and mock_redis standing in for Redis. Add specs alongside any change to `lib/`.
+
+Nothing runs this automatically yet; see [#2](https://github.com/diogoleitao/slack-ping-bot/issues/2).
 
 ## Pull Request Guidelines
 
@@ -346,7 +356,7 @@ gh release create v0.2.0 --title "v0.2.0" --notes "See CHANGELOG.md"
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Keep a Changelog](https://keepachangelog.com/)
 
-**Automated releases:** See `docs/TODO.md` section 7 for CI/CD setup details.
+**Automated releases:** See [#7](https://github.com/diogoleitao/slack-ping-bot/issues/7) for the automation intended to replace the manual process above.
 
 ## Bypassing Git Hooks
 
@@ -362,7 +372,7 @@ git commit --no-verify -m "WIP: temporary commit"
 
 - **Codebase context:** See `CLAUDE.md`
 - **Technical details:** See `docs/IMPLEMENTATION.md`
-- **Roadmap:** See `docs/TODO.md`
+- **Roadmap:** See [GitHub Issues](https://github.com/diogoleitao/slack-ping-bot/issues)
 - **User guide:** See `README.md`
 
 For questions not covered in documentation, open an issue for discussion.
