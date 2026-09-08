@@ -58,8 +58,10 @@ slack-ping-bot/
 ├── docker-compose.yml     # App + Redis setup
 ├── .env.example           # Environment template
 ├── README.md              # User documentation
+├── CONTEXT.md             # Domain glossary: ping, sender, target, notification
 ├── docs/
 │   ├── IMPLEMENTATION.md  # Complete technical docs (1,832 lines)
+│   ├── adr/               # Why the surprising decisions are what they are
 │   └── agents/            # Per-repo config read by the engineering skills
 │       ├── issue-tracker.md   # Where issues live (GitHub, via gh CLI)
 │       ├── triage-labels.md   # Canonical triage label vocabulary
@@ -305,6 +307,8 @@ git diff --cached --name-only | grep '\.rb$' | xargs bundle exec rubocop -A
 | `README.md` | User docs | 424 | Installation, usage, troubleshooting |
 | `docs/IMPLEMENTATION.md` | Technical docs | 1,832 | Complete spec, all file contents |
 | `scripts/setup-slack.sh` | Setup wizard | 380 | Slack app config + 33-item manual test pass |
+| `CONTEXT.md` | Domain glossary | - | Canonical terms: ping, sender, target, notification |
+| `docs/adr/` | Decision records | - | 150ms window, Redis fallback, no persistence |
 | `docs/agents/issue-tracker.md` | Skill config | - | Issues live in GitHub, `gh` CLI conventions |
 | `docs/agents/triage-labels.md` | Skill config | - | Triage role to label-string mapping |
 | `docs/agents/domain.md` | Skill config | - | How skills read `CONTEXT.md` and ADRs |
@@ -556,7 +560,13 @@ The five canonical triage labels, unrenamed: `needs-triage`, `needs-info`, `read
 
 ### Domain docs
 
-Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context: `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+Read `CONTEXT.md` before naming anything: it settles sender vs target, and ping vs notification. Read the ADRs before changing the code they cover:
+
+- [ADR-0001](docs/adr/0001-delete-the-ping-message-after-150ms.md): the 150ms sleep in `PingHandler` is deliberate and load-bearing
+- [ADR-0002](docs/adr/0002-rate-limiting-degrades-to-in-memory.md): Redis is optional, and the fallback is permanent for the process
+- [ADR-0003](docs/adr/0003-no-ping-data-is-persisted.md): no store by design, and logs are how that gets broken by accident
 
 ---
 
